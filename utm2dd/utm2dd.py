@@ -16,7 +16,7 @@ def string_transform(utm_string, easting_northing=True):
     Parameters
     ----------
     utm_string : str
-        UTM coordinate string. Format as: "10M 551884.29mE, 5278575.64mN"
+        UTM coordinate string. Format as: "10M 551884.29mE 5278575.64mN"
     easting_northing : bool, optional
         Default=True. Set to False if UTM is formated with mN before mE.
 
@@ -72,7 +72,7 @@ def list_transform(utm_list, coordinate_pairs=True, easting_northing=True):
     if coordinate_pairs == True:
         output = []
         for coordinate in utm_list:
-            latlong = string_transform(coordinate)
+            latlong = string_transform(coordinate, easting_northing=easting_northing)
             output.append(latlong)
     
     elif coordinate_pairs == False:
@@ -80,7 +80,7 @@ def list_transform(utm_list, coordinate_pairs=True, easting_northing=True):
         lon = []
         
         for coordinate in utm_list:
-            latlong = string_transform(coordinate)
+            latlong = string_transform(coordinate, easting_northing=easting_northing)
             lat.append(latlong[0])
             lon.append(latlong[1])
         
@@ -128,7 +128,7 @@ def column_transform(df, column_name, lat_column, lon_column, new_cols=False, re
     if new_cols == False:
         for coordinate in df.loc[:,column_name].astype(str):
             if coordinate != 'nan': #In case the column has empty entries
-                latlong = string_transform(coordinate)
+                latlong = string_transform(coordinate, easting_northing=easting_northing)
                 df.loc[df[column_name]==coordinate, lat_column] = latlong[0]
                 df.loc[df[column_name]==coordinate, lon_column] = latlong[1]
                 utm_count = utm_count + 1
@@ -142,7 +142,7 @@ def column_transform(df, column_name, lat_column, lon_column, new_cols=False, re
 
         for coordinate in df.loc[:,column_name].astype(str):
             if coordinate != 'nan':
-                latlong = string_transform(coordinate)
+                latlong = string_transform(coordinate, easting_northing=easting_northing)
                 lat.append(latlong[0])
                 lon.append(latlong[1])
                 utm_count = utm_count + 1
