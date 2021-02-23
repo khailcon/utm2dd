@@ -2,7 +2,7 @@
 
 This module builds off the utm package to translate batches of UTM coordinates into latitude and longitude coordinates. 
 
-This module works with UTM coordines formatted as follows: "10M 551884.29mE, 5278575.64mN"
+This module works with UTM coordines formatted as follows: "10M 551884.29mE 5278575.64mN"
 Digits can by of any length.
 
 """
@@ -49,7 +49,7 @@ def list_transform(utm_list, coordinate_pairs=True, easting_northing=True):
     Parameters
     ----------
     utm_list : list
-        a list of UTM coordinate strings. Strings formated as: "10M 551884.29mE, 5278575.64mN"
+        a list of UTM coordinate strings. Strings formated as: "10M 551884.29mE 5278575.64mN"
     coordinate_pairs : bool, optional
         Default = True. Set to False to output a dict of latitude and longitude lists
     easting_northing : bool, optional
@@ -70,10 +70,7 @@ def list_transform(utm_list, coordinate_pairs=True, easting_northing=True):
     """
     
     if coordinate_pairs == True:
-        output = []
-        for coordinate in utm_list:
-            latlong = string_transform(coordinate, easting_northing=easting_northing)
-            output.append(latlong)
+        output = [string_transform(coordinate, easting_northing=easting_northing) for coordinate in utm_list]
     
     elif coordinate_pairs == False:
         lat = []
@@ -87,7 +84,7 @@ def list_transform(utm_list, coordinate_pairs=True, easting_northing=True):
         output = {"lat":lat, "lon":lon}
     return(output)
 
-def column_transform(df, column_name, lat_column, lon_column, new_cols=False, report=False, easting_northing=True):
+def column_transform(df, column_name, lat_column, lon_column, new_cols=False, easting_northing=True):
     """Parse a column of UTM coordinate strings from a Pandas Dataframe into Latitude Longitude columns.
 
     For populating Lat Lon columns in a dataframe or creating those columns from a UTM coordinate column
@@ -107,23 +104,17 @@ def column_transform(df, column_name, lat_column, lon_column, new_cols=False, re
 
     new_cols: bool
         Default=False. Set to true to generate new columns for latitude and longitude coordinates rather than populate existing columns.
-    
-    report: bool
-        Default=False. Sets the function to return a printed report of how many entries were transformed and how many were not
-    
+
     easting_northing : bool, optional
         Default=True. Set to False if UTM is formated with mN before mE.
 
     Returns
     -------
-    if report parameter is set to True:
-    printed count of how many entries were transformed and how many were not.
+    A pandas dataframe copy of the input dataframe with the transformations
 
     """
-    # Initialize counts
-    utm_count = 0
-    not_transformed = 0
-    
+    # Initialize df copy
+    df = df.copy()
     #For populating existing Lat Lon columns:
     if new_cols == False:
         for coordinate in df.loc[:,column_name].astype(str):
@@ -131,9 +122,7 @@ def column_transform(df, column_name, lat_column, lon_column, new_cols=False, re
                 latlong = string_transform(coordinate, easting_northing=easting_northing)
                 df.loc[df[column_name]==coordinate, lat_column] = latlong[0]
                 df.loc[df[column_name]==coordinate, lon_column] = latlong[1]
-                utm_count = utm_count + 1
-            else:
-                not_transformed = not_transformed + 1
+                
     #For generating new La Lon columns:            
     elif new_cols == True:
         #Initialize strings that will become columns
@@ -145,16 +134,14 @@ def column_transform(df, column_name, lat_column, lon_column, new_cols=False, re
                 latlong = string_transform(coordinate, easting_northing=easting_northing)
                 lat.append(latlong[0])
                 lon.append(latlong[1])
-                utm_count = utm_count + 1
+               
             else:
                 lat.append(np.nan)
                 lon.append(np.nan)
-                not_transformed = not_transformed + 1
+                
         #Create columns using user input column names
         df[lat_column] = lat
         df[lon_column] = lon
     #Print the count report    
-    if report == True:
-        output = {"UTM Coordinates Processed":utm_count, "Entries Not Processed":not_transformed}
-        return(print(output))
+    return(df)
 
