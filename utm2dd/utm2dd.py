@@ -25,7 +25,8 @@ def string_transform(utm_string, easting_northing=True):
     tuple
         (Latitude, Longitude)
     """
-    split_UTM = utm_string.split() #string split the UTM elements
+    utm_strip = utm_string.strip()#remove leading or trailing spaces
+    split_UTM = utm_strip.split() #string split the UTM elements
     
     zone_num = float(split_UTM[0][:2]) #turn the zone number into a number
     zone_let = str(split_UTM[0][2:]) #turn the zone letter into its own letter
