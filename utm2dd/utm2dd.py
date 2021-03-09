@@ -42,7 +42,7 @@ def string_transform(utm_string, easting_northing=True):
     #turn into latlon
     latlong = utm.to_latlon(easting,northing,zone_num,zone_let)
     
-    return(latlong)
+    return latlong
 
 def list_transform(utm_list, coordinate_pairs=True, easting_northing=True):
     """Parse a list of UTM coordinates into either a list of latitude,longitude tuples or a dict of latitude and longitude lists
@@ -83,7 +83,7 @@ def list_transform(utm_list, coordinate_pairs=True, easting_northing=True):
             lon.append(latlong[1])
         
         output = {"lat":lat, "lon":lon}
-    return(output)
+    return output
 
 def column_transform(df, column_name, lat_column, lon_column, new_cols=False, easting_northing=True):
     """Parse a column of UTM coordinate strings from a Pandas Dataframe into Latitude Longitude columns.
@@ -144,5 +144,5 @@ def column_transform(df, column_name, lat_column, lon_column, new_cols=False, ea
         df[lat_column] = lat
         df[lon_column] = lon
     #Print the count report    
-    return(df)
+    return df
 
